@@ -1,0 +1,6 @@
+table relation
+factorder       id          user_id
+factorderitem   tradeid     user_id
+dimcustomer                 user_id
+coupon_redeemed             customer_id
+
