@@ -2,7 +2,7 @@
   "sheet 1": {
     "name": "YTD Until Mar",
     "period": {
-      "name": "Period",
+      "name": "Period: 20240301-20240331",
       "base_line": 1,
       "height": 1,
       "column": "A C"
@@ -14,20 +14,20 @@
       "column": "A R",
       "table 1": {
         "name": "2024YTD Sales Overview",
-        "base_line": 5,
+        "inc_line": 4,
         "height": 1,
-        "column": "B D",
+        "column": "B F",
         "head": {
           "value": "渠道\tTotal Sales\tMember Sales\tSales Penetration\tTotal Purchaser\tMember Purchaser\tMember Penetration\tNon_Member Sales\tNon_Member Purchaser\ttotal Trans",
-          "base_line": 6,
+          "inc_line": 5,
           "height": 1,
-          "column": "B K"
+          "column": "B L"
         },
         "body": {
           "sql": "",
-          "base_line": 7,
+          "inc_line": 6,
           "height": 3,
-          "column": "B K"
+          "column": "B L"
         }
       }
     }
