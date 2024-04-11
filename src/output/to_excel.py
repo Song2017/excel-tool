@@ -1,14 +1,27 @@
 import os
+from typing import Tuple
+
 import pandas as pd
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
 from openpyxl.styles import PatternFill, Alignment, Font
+from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
 
 def get_excel_range(base: int, height: int, column: str) -> tuple:
     cols = column.split()
     return cols[0] + str(base), cols[1] + str(base + height - 1)
+
+
+def get_excel_sheet(sheet_name: str = "", sheet_index: int = 0, file_path='./demo.xlsx') -> Tuple[Workbook, Worksheet]:
+    wb = load_workbook(file_path)
+    # 选择要追加数据的工作表，这里假设是第一个工作表
+    if sheet_name:
+        ws = wb[sheet_name]
+    else:
+        ws = wb.worksheets[sheet_index]
+    return wb, ws
 
 
 def export_excel(i_data: list, i_columns: list,
@@ -23,12 +36,7 @@ def export_excel(i_data: list, i_columns: list,
 
 def append_table(rows: list, sheet_name: str = "", sheet_index: int = 0, interval: int = 1, file_path='./demo.xlsx'):
     # 加载已存在的工作簿
-    wb = load_workbook(file_path)
-    # 选择要追加数据的工作表，这里假设是第一个工作表
-    if sheet_name:
-        ws = wb[sheet_name]
-    else:
-        ws = wb.worksheets[sheet_index]
+    wb, ws = get_excel_sheet(sheet_name, sheet_index, file_path)
     # 获取当前工作表中的最大行数
     max_row = ws.max_row
     max_row += interval
@@ -40,24 +48,22 @@ def append_table(rows: list, sheet_name: str = "", sheet_index: int = 0, interva
     wb.save(file_path)
 
 
-def append_table_head(ws: Worksheet, row: int, column: int, values: list, color="709bfa", font_size=11):
+def append_table_head(row: int, column: int, values: list, color="709bfa", font_size=11,
+                      sheet_name: str = "", sheet_index: int = 0, file_path='./demo.xlsx'):
+    wb, ws = get_excel_sheet(sheet_name, sheet_index, file_path)
     ws.row_dimensions[row].height = 80
     for i, v in enumerate(values):
         cell: Cell = ws.cell(row=row, column=column + i, value=v)
         cell.font = Font(size=font_size)
         cell.fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
+    wb.save(file_path)
 
 
 def append_sheet_title(start: str, end: str, value: str = "", sheet_name: str = "", sheet_index: int = 0,
                        file_path='./demo.xlsx', color="709bfa", font_size=11):
     # 创建一个新的工作簿
     # 加载已存在的工作簿
-    wb = load_workbook(file_path)
-    # 选择要追加数据的工作表，这里假设是第一个工作表
-    if sheet_name:
-        ws = wb[sheet_name]
-    else:
-        ws = wb.worksheets[sheet_index]
+    wb, ws = get_excel_sheet(sheet_name, sheet_index, file_path)
 
     # 设置填充颜色为蓝色
     fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
@@ -68,7 +74,7 @@ def append_sheet_title(start: str, end: str, value: str = "", sheet_name: str = 
     # 设置单元格填充颜色
     merged_cell.fill = fill
     # 设置文本内容
-    merged_cell.value = value or '合并单元格文本'
+    merged_cell.value = value or '文本'
     merged_cell.font = Font(size=font_size)
     # 设置文本内容居中
     merged_cell.alignment = Alignment(horizontal='center', vertical='center')

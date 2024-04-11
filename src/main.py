@@ -1,5 +1,6 @@
 from src.db.db_query import execute_query
 import json
+
 from src.output.to_excel import export_excel, append_sheet_title, get_excel_range
 
 
@@ -37,13 +38,11 @@ def main():
                 if not t_key.startswith("table"):
                     continue
                 t = gp.get(t_key)
-                er = get_excel_range(t["inc_line"]+gp_base_line, t["height"], t["column"])
+                er = get_excel_range(t["inc_line"] + gp_base_line, t["height"], t["column"])
                 append_sheet_title(er[0], er[1], value=t.get("name"),
                                    file_path=file_name, sheet_index=sheet_index)
                 # head
                 head = t.get('head')
-
-
 
     # rows = execute_query("", {})
 
