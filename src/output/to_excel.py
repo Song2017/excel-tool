@@ -1,11 +1,11 @@
 import os
-from typing import Tuple
+from typing import Tuple, List
 
 import pandas as pd
 from openpyxl import load_workbook
-from openpyxl.cell import Cell
 from openpyxl.styles import PatternFill, Alignment, Font
 from openpyxl.workbook import Workbook
+from openpyxl.worksheet.dimensions import SheetFormatProperties
 from openpyxl.worksheet.worksheet import Worksheet
 
 
@@ -14,7 +14,9 @@ def get_excel_range(base: int, height: int, column: str) -> tuple:
     return cols[0] + str(base), cols[1] + str(base + height - 1)
 
 
-def get_excel_sheet(sheet_name: str = "", sheet_index: int = 0, file_path='./demo.xlsx') -> Tuple[Workbook, Worksheet]:
+def get_excel_sheet(
+        sheet_name: str = "",
+        sheet_index: int = 0, file_path='./demo.xlsx') -> Tuple[Workbook, Worksheet]:
     wb = load_workbook(file_path)
     # 选择要追加数据的工作表，这里假设是第一个工作表
     if sheet_name:
@@ -31,6 +33,9 @@ def export_excel(i_data: list, i_columns: list,
     ise = "replace" if mode == "a" else None
     with pd.ExcelWriter(file_path, engine="openpyxl", mode=mode, if_sheet_exists=ise) as writer:
         db.to_excel(writer, sheet_name=sheet_name, index=False)
+    wb, ws = get_excel_sheet(sheet_name, 0, file_path)
+    ws.sheet_format = SheetFormatProperties(defaultColWidth=12, defaultRowHeight=20)
+    wb.save(file_path)
     return file_path
 
 
@@ -42,25 +47,24 @@ def append_table(rows: list, sheet_name: str = "", sheet_index: int = 0, interva
     max_row += interval
     # 追加一行数据，注意行号是从1开始的，所以新行的行号是 max_row + 1
     for col_num, value in enumerate(rows, start=1):
-        cell = ws.cell(row=max_row + 1, column=col_num, value=value)
-        print(cell)
-        # 保存工作簿
+        ws.cell(row=max_row + 1, column=col_num, value=value)
     wb.save(file_path)
 
 
-def append_table_head(row: int, column: int, values: list, color="709bfa", font_size=11,
-                      sheet_name: str = "", sheet_index: int = 0, file_path='./demo.xlsx'):
+def append_table_head(col: int, row: int, values: list, start: str = "A 1", color="709bfa", font_size=12,
+                      sheet_name: str = "", sheet_index: int = 0, row_height: int = 30, file_path='./demo.xlsx'):
     wb, ws = get_excel_sheet(sheet_name, sheet_index, file_path)
-    ws.row_dimensions[row].height = 80
-    for i, v in enumerate(values):
-        cell: Cell = ws.cell(row=row, column=column + i, value=v)
-        cell.font = Font(size=font_size)
+    for i in range(len(values)):
+        cell = ws.cell(row, col + i)
+        cell.value = values[i]
+        cell.font = Font(size=font_size, bold=True)
         cell.fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
+    ws.row_dimensions[row].height = row_height
     wb.save(file_path)
 
 
 def append_sheet_title(start: str, end: str, value: str = "", sheet_name: str = "", sheet_index: int = 0,
-                       file_path='./demo.xlsx', color="709bfa", font_size=11):
+                       file_path='./demo.xlsx', color="709bfa", font_size=12):
     # 创建一个新的工作簿
     # 加载已存在的工作簿
     wb, ws = get_excel_sheet(sheet_name, sheet_index, file_path)
@@ -75,10 +79,26 @@ def append_sheet_title(start: str, end: str, value: str = "", sheet_name: str = 
     merged_cell.fill = fill
     # 设置文本内容
     merged_cell.value = value or '文本'
-    merged_cell.font = Font(size=font_size)
+    merged_cell.font = Font(size=font_size, bold=True)
     # 设置文本内容居中
     merged_cell.alignment = Alignment(horizontal='center', vertical='center')
     # 保存工作簿
+    wb.save(file_path)
+
+
+def write_cells(col: int, row: int, data: List,
+                color="709bfa", font_size=12,
+                sheet_name: str = "", sheet_index: int = 0, row_height: int = 80, file_path='./demo.xlsx'):
+    assert len(data) > 0, "write_cells: please check data"
+    row_len = len(data)
+    col_len = len(data[0])
+    wb, ws = get_excel_sheet(sheet_name, sheet_index, file_path)
+    for r in range(row_len):
+        for c in range(col_len):
+            cell = ws.cell(row + r, col + c)
+            cell.value = data[r][c]
+            cell.font = Font(size=font_size)
+            cell.fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
     wb.save(file_path)
 
 

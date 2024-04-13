@@ -16,18 +16,18 @@
         "name": "2024YTD Sales Overview",
         "inc_line": 4,
         "height": 1,
-        "column": "B F",
+        "column": "A F",
         "head": {
           "value": "渠道\tTotal Sales\tMember Sales\tSales Penetration\tTotal Purchaser\tMember Purchaser\tMember Penetration\tNon_Member Sales\tNon_Member Purchaser\ttotal Trans",
           "inc_line": 5,
           "height": 1,
-          "column": "B L"
+          "column": "A L"
         },
         "body": {
-          "sql": "",
+          "sql": "select case when a.channel = 'shopex' then 'Offline' when a.channel = 'POS' then 'Offline' when a.channel = 'tmall' then 'TMALL' else 'others' end orderchannel, count(distinct case when a.userId is not null then a.userId else a.orderId end) purchaser,  sum(a.amount) sales, count(distinct a.id) Trans, sum(a.items)  from factorder a  where a.brand = 'Creed'  and a.orderCompleteTime >= '2024-01-01'  and a.orderCompleteTime < '2024-04-01'  and a.amount > 0  and a.ordertype = 1  and a.storeName <> 'CREED测试门店'  group by orderchannel WITH rollup",
           "inc_line": 6,
           "height": 3,
-          "column": "B L"
+          "column": "A L"
         }
       }
     }

@@ -6,7 +6,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 def get_session(sql_str: str = ""):
     sql_str = sql_str or os.getenv('DB_CONN')
-    print(sql_str)
     engine = create_engine(sql_str, encoding='utf-8')
     session = scoped_session(sessionmaker(bind=engine))
     return session
