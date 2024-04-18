@@ -38,22 +38,26 @@ def main():
                 if not t_key.startswith("table"):
                     continue
                 t = gp.get(t_key)
-                er = get_excel_range(t["inc_line"] + gp_base_line, t["height"], t["column"])
-                append_sheet_title(er[0], er[1], value=t.get("name"),
-                                   file_path=file_name, sheet_index=sheet_index)
-                # head
-                head: dict = t.get('head')
-                values = head.get("value").split('\t')
-                append_table_head(
-                    col=ord(head.get("column").split()[0]) - 64,
-                    row=head["inc_line"] + gp_base_line,
-                    values=values, file_path=file_name
-                )
-                # body
-                body: dict = t.get('body')
-                data = execute_query(body.get('sql'), {})
-                write_cells(col=ord(body.get("column").split()[0]) - 64,
-                            row=body["inc_line"] + gp_base_line, data=data, file_path=file_name)
+                write_table(t, gp_base_line, file_name, sheet_index)
+
+
+def write_table(t: dict, gp_base_line, file_name, sheet_index):
+    er = get_excel_range(t["inc_line"] + gp_base_line, t["height"], t["column"])
+    append_sheet_title(er[0], er[1], value=t.get("name"),
+                       file_path=file_name, sheet_index=sheet_index)
+    # head
+    head: dict = t.get('head')
+    values = head.get("value").split('\t')
+    append_table_head(
+        col=ord(head.get("column").split()[0]) - 64,
+        row=head["inc_line"] + gp_base_line,
+        values=values, file_path=file_name
+    )
+    # body
+    body: dict = t.get('body')
+    data = execute_query(body.get('sql'), {})
+    write_cells(col=ord(body.get("column").split()[0]) - 64, color="F5F5F5",
+                row=body["inc_line"] + gp_base_line, data=data, file_path=file_name)
 
 
 if __name__ == '__main__':
